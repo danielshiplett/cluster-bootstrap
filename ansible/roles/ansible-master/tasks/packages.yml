@@ -1,0 +1,31 @@
+
+#
+# Install the EPEL repo.  Both Ansible and pip packages come from there.
+#
+- name: Install the EPEL Repository
+  yum:
+    name: epel-release
+    state: latest
+
+
+#
+# Use pip to install ansible since older versions are not available in EPEL.
+#
+- name: Ensure Pip is installed.
+  package:
+    name: "{{ pip_package }}"
+    state: present
+
+- name: Ensure pip_install_packages are installed.
+  pip:
+    name: "{{ item.name | default(item) }}"
+    version: "{{ item.version | default(omit) }}"
+    virtualenv: "{{ item.virtualenv | default(omit) }}"
+    state: "{{ item.state | default(omit) }}"
+    executable: "{{ pip_executable }}"
+  with_items: "{{ pip_install_packages }}"
+
+#
+# Don't install Ansible from YUM.  Only the latest version of Ansible comes from
+# the EPEL repo.  Older versions come from pip.
+#

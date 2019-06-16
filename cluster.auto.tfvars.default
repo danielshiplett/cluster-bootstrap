@@ -1,0 +1,68 @@
+###
+### Input values for required variables
+###
+### This persists variable values
+### This file is called via a "-var-file" flag (in the apply/plan/destroy)
+###
+
+###########################################################################
+###  Admin generated values can be pasted below. See commented example  ###
+###########################################################################
+
+#########################  START: Example  ################################
+/*
+dns_eip = "xxx.xxx.xxx.xxx"
+
+dns_domain = "example.com"
+dns_subdomain = "cluster"
+
+# This is an example of how the above values would be used to generate the
+# public hostname of the Kubernetes Console (Kubernetes automatically adds
+# the "master" subdomain):
+# https://master.test0.example.com
+
+*/
+#########################  END: Example  ##################################
+
+### AWS profile in ~/.aws/credentials - changes depending on which account you are trying to deploy to
+profile = ""
+
+dns_domain = ""
+dns_subdomain = "dev"
+
+### For naming/tagging
+cluster_prefix = ""
+
+environment = "dev"
+
+schedule = "always-running"
+
+project = ""
+
+team = ""
+
+### AWS region
+region = "us-east-2"
+
+### SSH Keys
+bootstrap_ssh_key = ""
+
+### Networking
+ssh_ingress_cidr = ""
+
+vpc_cidr_block = "10.0.0.0/16"
+
+az_index = "0"
+
+# Public Subnets
+jumpbox_subnet = "10.0.5.0/24"
+
+management_subnet = "10.0.20.0/24"
+
+# Private Subnets
+core_subnet = "10.0.30.0/24"
+
+# CentOS 7 us-east-2 (Ohio)
+rhel_ami_id = "ami-0f2b4fc905b0bd1f1"
+
+ec2_user_name = "centos"

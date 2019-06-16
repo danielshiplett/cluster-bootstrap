@@ -1,0 +1,17 @@
+#
+# Manage our local administrators on all hosts.  Will create the user account,
+# setup their authorized_keys file, and add the user to the 'wheel' group so
+# they can sudo.
+#
+# Uses the same Role as the bootstrap playbook.  Just executes as a normal user
+# instead.
+#
+---
+- name: Configure Local Administrators
+  hosts: all
+  remote_user: "{{ lookup('env', 'USER') }}"
+  become: yes
+
+  tasks:
+  - include_role:
+      name: bootstrap

@@ -1,0 +1,8 @@
+---
+#
+# file: group_vars/all
+#
+# Add usernames for people who should be administrators on the hosts.  For each
+# username in this list, you need a corresponding .pub file in the files directory.
+
+local_admin_users: []

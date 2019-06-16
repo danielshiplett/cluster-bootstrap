@@ -1,0 +1,7 @@
+[all:vars]
+
+[all:children]
+jumpbox
+
+[jumpbox]
+jumpbox-00

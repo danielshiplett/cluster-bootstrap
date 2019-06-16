@@ -1,0 +1,20 @@
+
+### Ansible ###
+
+## Ignore Ansible pub files added for administrators.
+*.pub
+
+## Ignore all Ansible group_vars that aren't the .defaults
+ansible/group_vars/*
+!ansible/group_vars/*.default
+
+### Terraform ###
+
+## Protect all the sensitive account information files.
+providers.tf
+*.auto.tfvars
+*.tfvars
+terraform-remote-config.tf
+.terraform
+ec2
+backend-setup

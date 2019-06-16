@@ -1,0 +1,37 @@
+---
+  #
+  # Bootstrap all the users that should be local admins.
+  #
+
+- name: Register Group List
+  shell: /usr/bin/getent group | awk -F":" '{print $1}'
+  register: etc_groups
+  changed_when: False
+
+- name: Create local admin user and place in 'wheel' group
+  user:
+    name: "{{ item }}"
+    groups: wheel
+    append: yes
+  with_items: "{{ local_admin_users }}"
+
+- name: Make sure they are in the 'docker' group too if it is present
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  when: '"docker" in etc_groups.stdout_lines'
+  with_items: "{{ local_admin_users }}"
+
+- name: Add authorized keys
+  authorized_key:
+    user: "{{ item }}"
+    key: "{{ lookup('file', 'files/'+ item + '.pub') }}"
+  with_items: "{{ local_admin_users }}"
+
+- name: Allow admin users to sudo without a password
+  lineinfile:
+    dest: "/etc/sudoers" # path: in version 2.3
+    state: "present"
+    regexp: "^%wheel"
+    line: "%wheel ALL=(ALL) NOPASSWD: ALL"

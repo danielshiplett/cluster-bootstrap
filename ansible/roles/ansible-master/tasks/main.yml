@@ -1,0 +1,8 @@
+---
+# tasks file for ansible-master
+
+- name: Update & Reboot
+  include_tasks: update-and-reboot-once.yml
+
+- name: Install Required CentOS 7 Packages
+  include_tasks: packages.yml

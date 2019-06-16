@@ -1,0 +1,7 @@
+---
+# file: site.yml
+#
+# Master Site file.  Includes the bootstrap and all the group specific playbooks.
+
+- import_playbook: update-local-admins.yml
+- import_playbook: jumpbox.yml

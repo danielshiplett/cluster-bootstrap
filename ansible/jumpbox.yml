@@ -1,0 +1,13 @@
+---
+  #
+  # Playbook to setup a Jumpbox server.
+  #
+
+- name: Jumpbox Playbook
+  hosts: jumpbox
+  remote_user: "{{ lookup('env', 'USER') }}"
+  become: yes
+  tasks:
+
+    - import_role:
+        name: ansible-master

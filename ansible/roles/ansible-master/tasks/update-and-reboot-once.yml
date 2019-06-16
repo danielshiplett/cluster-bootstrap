@@ -1,0 +1,39 @@
+---
+- name: Register Update Log
+  stat:
+    path: "/root/update.log"
+  register: update_log
+
+- name: Update All
+  yum:
+    name: '*'
+    state: latest
+  register: update_result
+  when: update_log.stat.exists == false
+
+- name: Record Update
+  copy:
+    content: "{{ update_result.results }}"
+    dest: "/root/update.log"
+  when: update_log.stat.exists == false
+
+- name: Check for reboot hint
+  shell: LAST_KERNEL=$(rpm -q --last kernel | awk 'NR==1{sub(/kernel-/,""); print $1}'); CURRENT_KERNEL=$(uname -r); if [ $LAST_KERNEL != $CURRENT_KERNEL ]; then echo 'reboot'; else echo 'no'; fi
+  ignore_errors: true
+  register: reboot_hint
+  changed_when: False
+
+- name: Reboot immediately if there was a change
+  shell: "sleep 5 && reboot"
+  async: 1
+  poll: 0
+  when: reboot_hint.stdout.find("reboot") != -1
+  register: rebooting
+
+- name: Wait for the reboot to complete if there was a change
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 5
+    timeout: 300
+  when: rebooting is changed

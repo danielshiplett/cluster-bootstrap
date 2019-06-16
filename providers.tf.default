@@ -1,0 +1,25 @@
+#
+# Example providers file.  It assumes your account is in the 'us-east-2'
+# region and that your '$HOME/.aws/credentials' file is setup with a profile
+# called '<profile>'.  The account and keys associated with
+# that profile must have administrator access to the AWS account.
+#
+
+provider "aws" {
+  region  = "us-east-2"
+  profile = ""
+
+  version = "~> 1.59"
+}
+
+provider "random" {
+  version = "~> 2.0"
+}
+
+provider "template" {
+  version = "~> 1.0"
+}
+
+provider "null" {
+  version = "~> 1.0"
+}

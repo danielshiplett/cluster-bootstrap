@@ -1,0 +1,25 @@
+
+---
+  #
+  # A playbook to handle bootstrapping the node with local administrators.  This
+  # should be the first thing executed on all new nodes.  You will have to specify
+  # the three variables:
+  #
+  #  - bootstrap_host - the targeted host
+  #  - bootstrap_user - typically the 'root' user
+  #  - bootstrap_password - the password to login as the bootstrap_user
+  #
+  # After this playbook is executed, the rest of your provisioning can occur as
+  # a user with sudo privileges.
+  #
+
+- hosts: '{{ bootstrap_host }}'
+  remote_user: '{{ bootstrap_user }}'
+  become: yes
+
+  vars:
+    ansible_ssh_private_key_file: "{{ bootstrap_keyfile }}"
+
+  tasks:
+  - include_role:
+      name: bootstrap
