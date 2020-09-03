@@ -1,10 +1,12 @@
 ---
 # defaults file for ansible-master
 
+python3_package: python3
+
 # For Python 3, use python3-pip.
-pip_package: python-pip
-pip_executable: "{{ 'pip3' if pip_package.startswith('python3') else 'pip' }}"
+pip3_package: python3-pip
+pip_executable: "{{ 'pip3' }}"
 
 pip_install_packages:
   - name: ansible
-    version: 2.7.11
+    version: 2.9.13

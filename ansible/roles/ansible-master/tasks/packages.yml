@@ -7,13 +7,20 @@
     name: epel-release
     state: latest
 
+#
+# Make sure Python3 is installed
+#
+- name: Ensure Python3 is installed.
+  package:
+    name: "{{ python3_package }}"
+    state: latest
 
 #
 # Use pip to install ansible since older versions are not available in EPEL.
 #
-- name: Ensure Pip is installed.
+- name: Ensure Pip3 is installed.
   package:
-    name: "{{ pip_package }}"
+    name: "{{ pip3_package }}"
     state: present
 
 - name: Ensure pip_install_packages are installed.

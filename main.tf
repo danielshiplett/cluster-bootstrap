@@ -3,16 +3,16 @@
 #
 module "vpc" {
   source            = "./vpc"
-  clusterid         = "${local.clusterid}"
-  team              = "${var.team}"
-  project           = "${var.project}"
-  region            = "${var.region}"
-  az_index          = "${var.az_index}"
-  vpc_cidr_block    = "${var.vpc_cidr_block}"
-  jumpbox_subnet    = "${var.jumpbox_subnet}"
-  management_subnet = "${var.management_subnet}"
-  core_subnet       = "${var.core_subnet}"
-  ssh_ingress_cidr  = "${var.ssh_ingress_cidr}"
+  clusterid         = local.clusterid
+  team              = var.team
+  project           = var.project
+  region            = var.region
+  az_index          = var.az_index
+  vpc_cidr_block    = var.vpc_cidr_block
+  jumpbox_subnet    = var.jumpbox_subnet
+  management_subnet = var.management_subnet
+  core_subnet       = var.core_subnet
+  ssh_ingress_cidr  = var.ssh_ingress_cidr
 }
 
 #
@@ -20,7 +20,7 @@ module "vpc" {
 #
 resource "aws_key_pair" "keypair" {
   key_name   = "${local.clusterid}.${var.dns_domain}"
-  public_key = "${file("${var.bootstrap_ssh_key}")}"
+  public_key = file("${var.bootstrap_ssh_key}")
 }
 
 #
@@ -30,24 +30,23 @@ resource "aws_key_pair" "keypair" {
 # few source IPs.
 #
 resource "aws_instance" "jumpbox" {
-  count                       = "1"
-  ami                         = "${var.rhel_ami_id}"
+  ami                         = var.rhel_ami_id
   instance_type               = "t2.micro"
-  key_name                    = "${local.clusterid}.${var.dns_domain}"
+  key_name                    = aws_key_pair.keypair.key_name
   vpc_security_group_ids      = ["${module.vpc.jumpbox_sg}"]
-  subnet_id                   = "${module.vpc.jumpbox_subnet}"
+  subnet_id                   = module.vpc.jumpbox_subnet
   associate_public_ip_address = "true"
 
-  root_block_device = {
+  root_block_device {
     volume_type = "gp2"
     volume_size = "128"
   }
 
-  tags        = "${map("Name", "${local.clusterid}-jumpbox-00", "project", "${var.project}", "team", "${var.team}", "kubernetes.io/cluster/${local.clusterid}", "owned", "Schedule", "${var.schedule}")}"
-  volume_tags = "${map("Name", "${local.clusterid}-jumpbox-00-RootVolume", "project", "${var.project}", "team", "${var.team}", "kubernetes.io/cluster/${local.clusterid}", "owned")}"
+  tags        = map("Name", "${local.clusterid}-jumpbox-00", "project", "${var.project}", "team", "${var.team}", "kubernetes.io/cluster/${local.clusterid}", "owned", "Schedule", "${var.schedule}")
+  volume_tags = map("Name", "${local.clusterid}-jumpbox-00-RootVolume", "project", "${var.project}", "team", "${var.team}", "kubernetes.io/cluster/${local.clusterid}", "owned")
 
   # do all the VPC stuff before doing this jumpbox stuff
-  depends_on = ["module.vpc"]
+  depends_on = [module.vpc]
 }
 
 #
@@ -56,23 +55,23 @@ resource "aws_instance" "jumpbox" {
 resource "aws_eip" "jumpbox-eip" {
   vpc = "true"
 
-  tags {
+  tags = {
     Name    = "${local.clusterid}-eip-jumpbox"
-    project = "${var.project}"
-    team    = "${var.team}"
+    project = var.project
+    team    = var.team
   }
 
-  depends_on = ["aws_instance.jumpbox"]
+  depends_on = [aws_instance.jumpbox]
 }
 
 #
 # Associates an Elastic IP address with an Amazon EC2 Instance.
 #
 resource "aws_eip_association" "jumpbox-assoc" {
-  instance_id   = "${aws_instance.jumpbox.id}"
-  allocation_id = "${aws_eip.jumpbox-eip.id}"
+  instance_id   = aws_instance.jumpbox.id
+  allocation_id = aws_eip.jumpbox-eip.id
 
-  depends_on = ["aws_eip.jumpbox-eip"]
+  depends_on = [aws_eip.jumpbox-eip]
 }
 
 #
@@ -80,7 +79,7 @@ resource "aws_eip_association" "jumpbox-assoc" {
 #
 resource "null_resource" "wait-jumpbox" {
   connection {
-    host  = "${aws_eip.jumpbox-eip.public_ip}"
+    host  = aws_eip.jumpbox-eip.public_ip
     type  = "ssh"
     user  = "centos"
     agent = "true"
@@ -90,7 +89,7 @@ resource "null_resource" "wait-jumpbox" {
     inline = ["cloud-init status --wait"]
   }
 
-  depends_on = ["aws_eip_association.jumpbox-assoc"]
+  depends_on = [aws_eip_association.jumpbox-assoc]
 }
 
 #
@@ -112,5 +111,5 @@ resource "null_resource" "provision-jumpbox" {
 EOC
   }
 
-  depends_on = ["null_resource.wait-jumpbox"]
+  depends_on = [null_resource.wait-jumpbox]
 }
